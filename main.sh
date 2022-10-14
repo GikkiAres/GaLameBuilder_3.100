@@ -3,9 +3,7 @@
 # debug or release
 # export g_configure="debug"
 export g_configure="release"
-# 判断哪些平台需要编译.
-platformArray=("ios" "android" "mac" "centos" "windows")
-valueArray=("N" "N" "Y" "N" "N")
+
 ### User Configure End ###
 
 # +++ Variable Start +++
@@ -49,18 +47,61 @@ function downloadIfNeeded() {
 
 }
 
+function isMac() {
+    info=`uname`
+    if [[ ${info} == "Darwin" ]]; then
+        echo "Y";
+    else 
+        echo "N";
+    fi
+}
+
+function isCentOs() {
+    info=`cat /etc/redhat-release`
+    result=`echo ${info} | grep CentOS`
+    if [[ "${result}" != "" ]]; then
+        echo "Y";
+    else 
+        echo "N";
+    fi
+}
+
+function isUbuntuOs() {
+    result=`cat /etc/issue | grep Ubuntu`
+    if [[ "${result}" != "" ]]; then 
+        echo "Y";
+    else
+        echo "N";
+    fi
+}
+
+
+	# 判断哪些平台需要编译.
+	# Y,表示编译.
+	# N,表示不编译.
+	# A,表示自动判断当前系统,当前系统为指定系统就编译.
+function buildIfNeeded() {
+	platformArray=("ios" "android" "mac" "centos" "ubuntu")
+	isBuildMac=`isMac`
+	isBuildCentOs=`isCentOs`
+	isBuildUbuntu=`isUbuntuOs`
+	valueArray=("N" "N" ${isBuildMac} ${isBuildCentOs} ${isBuildUbuntu})
+	declare -i length=${#platformArray[@]}
+	for (( i = 0 ; i < ${length} ; i++))
+	do
+		key=${platformArray[i]}
+		value=${valueArray[i]}
+		echo "platform: ${key},build: ${value}"
+		if [[ "${value}" == "Y" ]]; then
+			. ${g_scriptRootDir}/${key}/${key}_manager.sh
+			[[ $? != 0 ]] && echo "error" && exit
+		fi      
+	done
+}
+
 function main() {
     downloadIfNeeded
-    declare -i length=${#platformArray[@]}
-    for ((i = 0; i < ${length}; i++)); do
-        key=${platformArray[i]}
-        value=${valueArray[i]}
-        echo "platfrom: ${key},build: ${value}"
-        if [[ "${value}" == "Y" ]]; then
-            . ${g_scriptRootDir}/${key}/${key}_manager.sh
-            [[ $? != 0 ]] && echo "error" && exit
-        fi
-    done
+    buildIfNeeded
 }
 
 main
