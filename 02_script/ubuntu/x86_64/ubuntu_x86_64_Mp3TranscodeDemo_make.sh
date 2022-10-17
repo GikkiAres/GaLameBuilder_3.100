@@ -92,6 +92,9 @@ doCMake() {
 
 doMake() {
     echo "+++ make start +++"
+    export inputLibDir=${inputLibDir}
+    export g_outputArchDir=${g_outputArchDir}
+    export outputLibDir=${outputLibDir}
     make -j4
     [[ $? != 0 ]] && echo "--- make failed ---\n\n\n" && exit
     echo "=== make end ===\n\n\n"
@@ -112,14 +115,14 @@ main () {
     # ubuntu的math库为-lm  /usr/lib/x86_64-linux-gnu/libm.so
 
     if [[ ${isMake} == "Y" ]]; then
-        rm -rf ${outputLibDir}
-        gcc ${inputLibDir}/main.c -I${g_outputArchDir}/lame-3.100/include ${g_outputArchDir}/lame-3.100/lib/libmp3lame.a -lm
-        cp a.out ${outputLibDir}/a.out
+        doMake
+        doInstall
         [[ $? != 0 ]] && echo "make failed" && exit
     else 
         echo "No need to make."
     fi
-    ${outputLibDir}/a.out ${g_inputRootDir}/timeless.pcm timeless.mp3
+    # ${outputLibDir}/a.out ${g_inputRootDir}/timeless.pcm timeless.mp3
+    
     # doFinish
     echo "=== Build ${libId} for ${g_platform} with ${g_arch} finish ===\n\n\n"
 }

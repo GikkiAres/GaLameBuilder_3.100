@@ -114,7 +114,7 @@ main () {
     if [[ ${isMake} == "Y" ]]; then
         rm -rf ${outputLibDir}
         gcc ${inputLibDir}/main.c -I${g_outputArchDir}/lame-3.100/include ${g_outputArchDir}/lame-3.100/lib/libmp3lame.a -lm
-        cp a.out ${outputLibDir}/a.out
+        mv a.out ${outputLibDir}/a.out
         [[ $? != 0 ]] && echo "make failed" && exit
     else 
         echo "No need to make."
