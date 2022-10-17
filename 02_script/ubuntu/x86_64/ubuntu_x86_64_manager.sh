@@ -20,9 +20,11 @@ main () {
 	
 	#openssl
     export g_libId="lame-3.100"
-	. ${g_scriptArchDir}/${g_platform}_${g_arch}_${g_libId}.sh Y Y
+	. ${g_scriptArchDir}/${g_platform}_${g_arch}_${g_libId}.sh N N
 	export PKG_CONFIG_PATH+=":${g_outputArchDir}/${g_libId}/lib/pkgconfig" 
 
+    export g_libId="Mp3TranscodeDemo"
+    . ${g_scriptArchDir}/${g_platform}_${g_arch}_${g_libId}.sh
     
     echo "=== Build for ${g_platform} with ${g_arch} End ===\n\n\n"
 }
