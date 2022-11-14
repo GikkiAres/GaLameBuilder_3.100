@@ -6,6 +6,7 @@ export g_configure="release"
 # 判断哪些平台需要编译.
 platformArray=("ios" "android" "mac" "linux" "windows")
 valueArray=("N" "Y" "N" "N" "N")
+
 ### User Configure End ###
 
 
@@ -27,6 +28,7 @@ export g_outputConfigureDir="${g_outputRootDir}/${g_configure}"
 
 
 function downloadLame3_100IfNeeded() {
+    # 库下载地址
     libDownloadUrl="https://udomain.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz"
     # 库id,规则为${libName}-${libVersion}
     libId="lame-3.100"
@@ -43,11 +45,66 @@ function cloneJsShellUtilityIfNeeded() {
         info=$(ls ${targetDir})
         if [[ "${info}" != "" ]]; then
             return 0
+    if [[ ! -e "${g_inputRootDir}/${libId}" ]]; then
+        if [[ ! -e "${libZipPath}" ]]; then
+            echo "downloading ${libId}..."
+            curl -o "${libZipPath}" "${libDownloadUrl}"
+            [[ $? != 0 ]] && echo "download failed" && exit
         fi
     fi
     mkdir -p $(dirname ${targetDir})
     cmd="git clone git@github.com:GikkiAres/JsShellUtility.git ${targetDir}"
     eval ${cmd}
+=======
+}
+
+function cloneJsShellUtilityIfNeeded() {
+    targetDir="${g_scriptRootDir}/utility/JsShellUtility"
+    isDirNotEmpty ${targetDir}
+    [[ "$?" = "1" ]] && return;
+    mkdir -p `dirname ${targetDir}`
+    cmd="git clone git@github.com:GikkiAres/JsShellUtility.git ${targetDir}";
+    eval ${cmd}
+}
+
+# 判断文件夹是否存在且非空
+function isDirNotEmpty() {
+    dirPath=$1
+    if [[ ! -e "${dirPath}" ]]; then
+        echo "dir exists"
+        return 0;
+    fi
+    info=`ls ${dirPath}`
+    if [[ "${info}" = "" ]]; then
+        echo "dir is empty"
+        return 0;
+    fi
+    return 1;
+}
+
+
+
+	# 判断哪些平台需要编译.
+	# Y,表示编译.
+	# N,表示不编译.
+	# A,表示自动判断当前系统,当前系统为指定系统就编译.
+function buildIfNeeded() {
+	platformArray=("ios" "android" "mac" "linux" "windows")
+	isBuildMac=`isMac`
+	isBuildCentOs=`isCentos`
+	isBuildUbuntu=`isUbuntu`
+	valueArray=("N" "N" ${isBuildMac} ${isBuildCentOs} ${isBuildUbuntu})
+	declare -i length=${#platformArray[@]}
+	for (( i = 0 ; i < ${length} ; i++))
+	do
+		key=${platformArray[i]}
+		value=${valueArray[i]}
+		echo "platform: ${key},build: ${value}"
+		if [[ "${value}" == "Y" ]]; then
+			. ${g_scriptRootDir}/${key}/${key}_manager.sh
+			[[ $? != 0 ]] && echo "error" && exit
+		fi      
+	done
 }
 
 function main() {
@@ -55,16 +112,6 @@ function main() {
     . ${g_scriptRootDir}/utility/JsShellUtility/DownloadManager-0.0.0.sh
     . ${g_scriptRootDir}/utility/JsShellUtility/SystemManager-0.0.0.sh
     downloadLame3_100IfNeeded
-    declare -i length=${#platformArray[@]}
-    for ((i = 0; i < ${length}; i++)); do
-        key=${platformArray[i]}
-        value=${valueArray[i]}
-        echo "platfrom: ${key},build: ${value}"
-        if [[ "${value}" == "Y" ]]; then
-            . ${g_scriptRootDir}/${key}/${key}_manager.sh
-            [[ $? != 0 ]] && echo "error" && exit
-        fi
-    done
+    buildIfNeeded
 }
-
 main
