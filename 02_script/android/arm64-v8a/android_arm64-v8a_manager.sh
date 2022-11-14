@@ -42,7 +42,7 @@ export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
 main () {
     echo "+++ Build for ${g_platform} with ${g_arch} Start +++"
 
-    . ${g_scriptArchDir}/android_arm64-v8a_lame-3.100.sh Y Y
+    . ${g_scriptArchDir}/android_arm64-v8a_lame-3.100.sh N Y
     
     echo "=== Build for ${g_platform} with ${g_arch} End ===\n\n\n"
 }

@@ -70,33 +70,16 @@ doClean() {
 doConfigure() {
     echo "+++ configure start +++" 
     
-	# host,cc,cxx是必须指定正确的.
+	# host 要运行的机器的类别,具体
 	host="aarch64-linux-android"
     toolChainDir=${g_ndkDir}/toolchains/llvm/prebuilt/darwin-x86_64
-	# arm64的在arch-arm64文件夹中. 该文件夹下,包含很多的系统库.
-    # PLATFORM=${g_ndkDir}/platforms/android-${g_apiLevel}/arch-arm64
-    # export PATH=$PATH:${ndkBinDir}:$PLATFORM/usr/include
 
 	# C++编译器
     export CXX="${toolChainDir}/bin/${host}${g_apiLevel}-clang++"
 	# C编译器
     export CC="${toolChainDir}/bin/${host}${g_apiLevel}-clang"
 
-	# sysroot指不指定,没有作用呢?
-	# --sysroot=${PLATFORM}
-	# export CFLAGS="-isystem $g_ndkDir/sysroot/usr/include -isystem $g_ndkDir/sysroot/usr/include/aarch64-linux-android"
-	
-	# C编译器参数
-	# export CFLAGS="--sysroot=${PLATFORM}"
-	# C++编译器参数
-    # export CXXFLAGS="$CFLAGS"
-	# 预处理器参数
-	# export CPPFLAGS="$CFLAGS"
-	# 链接参数
-    # export LDFLAGS="-L$PLATFORM/usr/lib -L$PREBUILT/${host}/lib -L${g_ndkDir}/sysroot/usr/lib/aarch64-linux-android"
-    
-
-    #不需要指定会自动判断.
+    # 指定各个工具的目录
  	export LD="${toolChainDir}/bin/aarch64-linux-android-ld"
 	export AS="${toolChainDir}/bin/aarch64-linux-android-as"
     export LD="${toolChainDir}/bin/aarch64-linux-android-ld"

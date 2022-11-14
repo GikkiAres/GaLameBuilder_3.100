@@ -38,7 +38,7 @@ function mergeThinToFat() {
 
 #键值,两个数组.
 archArray=("arm64-v8a" "armabi-v7a")
-valueArray=("Y" "N")
+valueArray=("N" "Y")
 # echo "${archMap[*]}"
 declare -i length=${#archArray[@]}
 for (( i = 0 ; i < ${length} ; i++))

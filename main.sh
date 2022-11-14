@@ -4,9 +4,11 @@
 # export g_configure="debug"
 export g_configure="release"
 # 判断哪些平台需要编译.
-platformArray=("ios" "android" "mac" "centos" "windows")
-valueArray=("N" "N" "Y" "N" "N")
+platformArray=("ios" "android" "mac" "linux" "windows")
+valueArray=("N" "Y" "N" "N" "N")
 ### User Configure End ###
+
+
 
 # +++ Variable Start +++
 # 全局地址
@@ -23,34 +25,36 @@ export g_utilityDir="${g_scriptRootDir}/utility"
 export g_buildConfigureDir="${g_buildRootDir}/${g_configure}"
 export g_outputConfigureDir="${g_outputRootDir}/${g_configure}"
 
-# 程序内部的变量
-# 库下载地址
-libDownloadUrl="https://udomain.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz"
-# 库id,规则为${libName}-${libVersion}
-libId="lame-3.100"
-# lib压缩包文件路径
-libZipPath="${g_inputRootDir}/${libId}.tar.gz"
-sourceLibPath="${g_inputRootDir}/${libId}"
-# === Variable End ===
 
-function downloadIfNeeded() {
-    if [[ ! -e "${g_inputRootDir}/${libId}" ]]; then
-        if [[ ! -e "${libZipPath}" ]]; then
-            echo "downloading ${libId}..."
-            curl -o "${libZipPath}" "${libDownloadUrl}"
-            [[ $? != 0 ]] && echo "download failed" && exit
+function downloadLame3_100IfNeeded() {
+    libDownloadUrl="https://udomain.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz"
+    # 库id,规则为${libName}-${libVersion}
+    libId="lame-3.100"
+    # lib压缩包文件路径
+    libZipPath="${g_inputRootDir}/${libId}.tar.gz"
+    sourceLibPath="${g_inputRootDir}/${libId}"
+    downloadZipIfNeeded ${libDownloadUrl} ${libZipPath} ${sourceLibPath}
+}
+
+function cloneJsShellUtilityIfNeeded() {
+    targetDir="${g_scriptRootDir}/utility/JsShellUtility"
+    # 存在且不为空,则继续.
+    if [[ -e "${targetDir}" ]]; then
+        info=$(ls ${targetDir})
+        if [[ "${info}" != "" ]]; then
+            return 0
         fi
-        echo "uncompress ${libId}..."
-        tar zxvf ${libZipPath}  -C "${g_inputRootDir}"
-        [[ $? != 0 ]] && echo "uncompress failed" && exit
-    else
-        echo "lib ${libId} existed."
     fi
-
+    mkdir -p $(dirname ${targetDir})
+    cmd="git clone git@github.com:GikkiAres/JsShellUtility.git ${targetDir}"
+    eval ${cmd}
 }
 
 function main() {
-    downloadIfNeeded
+    cloneJsShellUtilityIfNeeded
+    . ${g_scriptRootDir}/utility/JsShellUtility/DownloadManager-0.0.0.sh
+    . ${g_scriptRootDir}/utility/JsShellUtility/SystemManager-0.0.0.sh
+    downloadLame3_100IfNeeded
     declare -i length=${#platformArray[@]}
     for ((i = 0; i < ${length}; i++)); do
         key=${platformArray[i]}
