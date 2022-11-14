@@ -22,16 +22,17 @@ export g_buildConfigureDir="${g_buildRootDir}/${g_configure}"
 export g_outputConfigureDir="${g_outputRootDir}/${g_configure}"
 
 # 程序内部的变量
-# 库下载地址
-libDownloadUrl="https://udomain.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz"
-# 库id,规则为${libName}-${libVersion}
-libId="lame-3.100"
-# lib压缩包文件路径
-libZipPath="${g_inputRootDir}/${libId}.tar.gz"
-sourceLibPath="${g_inputRootDir}/${libId}"
+
 # === Variable End ===
 
-function downloadIfNeeded() {
+function downloadLameIfNeeded() {
+    # 库下载地址
+    libDownloadUrl="https://udomain.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz"
+    # 库id,规则为${libName}-${libVersion}
+    libId="lame-3.100"
+    # lib压缩包文件路径
+    libZipPath="${g_inputRootDir}/${libId}.tar.gz"
+    sourceLibPath="${g_inputRootDir}/${libId}"
     if [[ ! -e "${g_inputRootDir}/${libId}" ]]; then
         if [[ ! -e "${libZipPath}" ]]; then
             echo "downloading ${libId}..."
@@ -44,36 +45,32 @@ function downloadIfNeeded() {
     else
         echo "lib ${libId} existed."
     fi
-
 }
 
-function isMac() {
-    info=`uname`
-    if [[ ${info} == "Darwin" ]]; then
-        echo "Y";
-    else 
-        echo "N";
+function cloneJsShellUtilityIfNeeded() {
+    targetDir="${g_scriptRootDir}/utility/JsShellUtility"
+    isDirNotEmpty ${targetDir}
+    [[ "$?" = "1" ]] && return;
+    mkdir -p `dirname ${targetDir}`
+    cmd="git clone git@github.com:GikkiAres/JsShellUtility.git ${targetDir}";
+    eval ${cmd}
+}
+
+# 判断文件夹是否存在且非空
+function isDirNotEmpty() {
+    dirPath=$1
+    if [[ ! -e "${dirPath}" ]]; then
+        echo "dir exists"
+        return 0;
     fi
+    info=`ls ${dirPath}`
+    if [[ "${info}" = "" ]]; then
+        echo "dir is empty"
+        return 0;
+    fi
+    return 1;
 }
 
-function isCentOs() {
-    info=`cat /etc/redhat-release`
-    result=`echo ${info} | grep CentOS`
-    if [[ "${result}" != "" ]]; then
-        echo "Y";
-    else 
-        echo "N";
-    fi
-}
-
-function isUbuntuOs() {
-    result=`cat /etc/issue | grep Ubuntu`
-    if [[ "${result}" != "" ]]; then 
-        echo "Y";
-    else
-        echo "N";
-    fi
-}
 
 
 	# 判断哪些平台需要编译.
@@ -81,10 +78,10 @@ function isUbuntuOs() {
 	# N,表示不编译.
 	# A,表示自动判断当前系统,当前系统为指定系统就编译.
 function buildIfNeeded() {
-	platformArray=("ios" "android" "mac" "centos" "ubuntu")
+	platformArray=("ios" "android" "mac" "linux" "windows")
 	isBuildMac=`isMac`
-	isBuildCentOs=`isCentOs`
-	isBuildUbuntu=`isUbuntuOs`
+	isBuildCentOs=`isCentos`
+	isBuildUbuntu=`isUbuntu`
 	valueArray=("N" "N" ${isBuildMac} ${isBuildCentOs} ${isBuildUbuntu})
 	declare -i length=${#platformArray[@]}
 	for (( i = 0 ; i < ${length} ; i++))
@@ -100,8 +97,9 @@ function buildIfNeeded() {
 }
 
 function main() {
-    downloadIfNeeded
+    cloneJsShellUtilityIfNeeded
+    . ${g_scriptRootDir}/utility/JsShellUtility/SystemManager-0.0.0.sh
+    downloadLameIfNeeded
     buildIfNeeded
 }
-
 main

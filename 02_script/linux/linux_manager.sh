@@ -1,5 +1,5 @@
 # platform级别的变量定义
-export g_platform="ubuntu"
+export g_platform="linux"
 export g_inputPlatformDir="${g_inputRootDir}/${g_platform}"
 export g_scriptPlatformDir="${g_scriptRootDir}/${g_platform}"
 export g_buildPlatformDir="${g_buildConfigureDir}/${g_platform}"
