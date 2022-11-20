@@ -45,6 +45,8 @@ function cloneJsShellUtilityIfNeeded() {
         info=$(ls ${targetDir})
         if [[ "${info}" != "" ]]; then
             return 0
+        fi
+    fi
     if [[ ! -e "${g_inputRootDir}/${libId}" ]]; then
         if [[ ! -e "${libZipPath}" ]]; then
             echo "downloading ${libId}..."
@@ -55,7 +57,6 @@ function cloneJsShellUtilityIfNeeded() {
     mkdir -p $(dirname ${targetDir})
     cmd="git clone git@github.com:GikkiAres/JsShellUtility.git ${targetDir}"
     eval ${cmd}
-=======
 }
 
 function cloneJsShellUtilityIfNeeded() {
@@ -90,10 +91,6 @@ function isDirNotEmpty() {
 	# A,表示自动判断当前系统,当前系统为指定系统就编译.
 function buildIfNeeded() {
 	platformArray=("ios" "android" "mac" "linux" "windows")
-	isBuildMac=`isMac`
-	isBuildCentOs=`isCentos`
-	isBuildUbuntu=`isUbuntu`
-	valueArray=("N" "N" ${isBuildMac} ${isBuildCentOs} ${isBuildUbuntu})
 	declare -i length=${#platformArray[@]}
 	for (( i = 0 ; i < ${length} ; i++))
 	do
