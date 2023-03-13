@@ -1,15 +1,28 @@
 ### User Configure Start ###
 # 用户需要配置的信息
-# debug or release
-# export g_configure="debug"
-export g_configure="release"
+export CONFIGURE_TYPE_DEBUG="debug"
+export CONFIGURE_TYPE_RELEASE="release"
+export g_configureType=$CONFIGURE_TYPE_RELEASE
 # 判断哪些平台需要编译.
-platformArray=("ios" "android" "mac" "linux" "windows")
-valueArray=("N" "Y" "N" "N" "N")
+# 不编译
+export BUILD_FLAG_NO="N"
+# 编译
+export BUILD_FLAG_YES="Y"
+# 判断当前平台是不是该平台,是就编译否则不编译.
+export BUILD_FLAG_AUTO="A"
+platformArray=("ios" "android" "mac" "linux")
+valueArray=($BUILD_FLAG_YES $BUILD_FLAG_NO $BUILD_FLAG_NO $BUILD_FLAG_NO)
 
 ### User Configure End ###
 
+# +++ 脚本常量 Start  +++
+export LIB_BUILD_TYPE_CONFIGURE="C"
+export LIB_BUILD_TYPE_MAKE="M"
+export LIB_BUILD_TYPE_IGNORE="I"
+export LIB_BUILD_TYPE_CONFIGURE_MAKE="B"
+# === 脚本常量 End  ===
 
+# === Lib Build Flag===
 
 # +++ Variable Start +++
 # 全局地址
@@ -23,8 +36,8 @@ export g_scriptRootDir=${g_projectDir}/02_script
 export g_buildRootDir=${g_projectDir}/03_build
 export g_outputRootDir=${g_projectDir}/04_output
 export g_utilityDir="${g_scriptRootDir}/utility"
-export g_buildConfigureDir="${g_buildRootDir}/${g_configure}"
-export g_outputConfigureDir="${g_outputRootDir}/${g_configure}"
+export g_buildConfigureDir="${g_buildRootDir}/${g_configureType}"
+export g_outputConfigureDir="${g_outputRootDir}/${g_configureType}"
 
 
 function downloadLame3_100IfNeeded() {
@@ -36,27 +49,6 @@ function downloadLame3_100IfNeeded() {
     libZipPath="${g_inputRootDir}/${libId}.tar.gz"
     sourceLibPath="${g_inputRootDir}/${libId}"
     downloadZipIfNeeded ${libDownloadUrl} ${libZipPath} ${sourceLibPath}
-}
-
-function cloneJsShellUtilityIfNeeded() {
-    targetDir="${g_scriptRootDir}/utility/JsShellUtility"
-    # 存在且不为空,则继续.
-    if [[ -e "${targetDir}" ]]; then
-        info=$(ls ${targetDir})
-        if [[ "${info}" != "" ]]; then
-            return 0
-        fi
-    fi
-    if [[ ! -e "${g_inputRootDir}/${libId}" ]]; then
-        if [[ ! -e "${libZipPath}" ]]; then
-            echo "downloading ${libId}..."
-            curl -o "${libZipPath}" "${libDownloadUrl}"
-            [[ $? != 0 ]] && echo "download failed" && exit
-        fi
-    fi
-    mkdir -p $(dirname ${targetDir})
-    cmd="git clone git@github.com:GikkiAres/JsShellUtility.git ${targetDir}"
-    eval ${cmd}
 }
 
 function cloneJsShellUtilityIfNeeded() {
@@ -90,7 +82,6 @@ function isDirNotEmpty() {
 	# N,表示不编译.
 	# A,表示自动判断当前系统,当前系统为指定系统就编译.
 function buildIfNeeded() {
-	platformArray=("ios" "android" "mac" "linux" "windows")
 	declare -i length=${#platformArray[@]}
 	for (( i = 0 ; i < ${length} ; i++))
 	do
@@ -100,6 +91,12 @@ function buildIfNeeded() {
 		if [[ "${value}" == "Y" ]]; then
 			. ${g_scriptRootDir}/${key}/${key}_manager.sh
 			[[ $? != 0 ]] && echo "error" && exit
+        elif [[ "${value}" == "A" ]]; then
+            # 等于key == o
+            currentPlatform=""
+            if [[ $currentPlatform == $key ]]; then
+                . ${g_scriptRootDir}/${key}/${key}_manager.sh
+            fi
 		fi      
 	done
 }

@@ -134,7 +134,6 @@ main () {
     echo "\n\n\n+++ Build ${libId} for ${g_platform} with ${g_arch} start  +++"
     
 	cd ${buildLibDir}
-	judgeIsNeedConfigureOrMake
 
     if [[ ${isConfigure} == "Y" ]]; then
         doClean
