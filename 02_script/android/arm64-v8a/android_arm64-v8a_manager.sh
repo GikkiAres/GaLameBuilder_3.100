@@ -24,19 +24,6 @@ g_outputArchDir=${g_outputPlatformDir}/${g_arch}
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
 
 
-# export ANDROID_API_LEVEL="23"
-# export host="aarch64-linux-android"
-# export ABI="arm64-v8a"
-# export CROSS_COMPILE=${androidNdkBinDir}/${host}-
-# export CXX=${androidNdkBinDir}/${host}${ANDROID_API_LEVEL}-clang++
-# export commonCC=${androidNdkBinDir}/${host}${ANDROID_API_LEVEL}-clang
-
-# echo "CC is: ${CC}"
-# echo "androidNdkBinDir is: ${androidNdkBinDir}"
-# echo "host is: ${host}"
-# echo "ANDROID_API_LEVEL is: ${ANDROID_API_LEVEL}"
-# echo "archInstallDir is: ${archInstallDir}"
-# echo "buildArchDir is: ${g_buildArchDir}"
 # echo "scriptArchDir is: ${g_scriptArchDir}"
 
 main () {

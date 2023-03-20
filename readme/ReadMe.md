@@ -12,6 +12,3 @@ armv
 
 mac
 mac,x86-64
-
-linux
-linux,x86-64

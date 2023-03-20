@@ -11,7 +11,7 @@ export BUILD_FLAG_YES="Y"
 # 判断当前平台是不是该平台,是就编译否则不编译.
 export BUILD_FLAG_AUTO="A"
 platformArray=("ios" "android" "mac" "linux")
-valueArray=($BUILD_FLAG_YES $BUILD_FLAG_NO $BUILD_FLAG_NO $BUILD_FLAG_NO)
+valueArray=($BUILD_FLAG_NO $BUILD_FLAG_YES $BUILD_FLAG_NO $BUILD_FLAG_NO)
 
 ### User Configure End ###
 
@@ -85,17 +85,17 @@ function buildIfNeeded() {
 	declare -i length=${#platformArray[@]}
 	for (( i = 0 ; i < ${length} ; i++))
 	do
-		key=${platformArray[i]}
-		value=${valueArray[i]}
-		echo "platform: ${key},build: ${value}"
-		if [[ "${value}" == "Y" ]]; then
-			. ${g_scriptRootDir}/${key}/${key}_manager.sh
+		platform=${platformArray[i]}
+		buildFlag=${valueArray[i]}
+		echo "platform: ${platform},build: ${buildFlag}"
+		if [[ "${buildFlag}" == "Y" ]]; then
+			. ${g_scriptRootDir}/${platform}/${platform}_manager.sh
 			[[ $? != 0 ]] && echo "error" && exit
-        elif [[ "${value}" == "A" ]]; then
+        elif [[ "${buildFlag}" == "A" ]]; then
             # 等于key == o
             currentPlatform=""
             if [[ $currentPlatform == $key ]]; then
-                . ${g_scriptRootDir}/${key}/${key}_manager.sh
+                . ${g_scriptRootDir}/${platform}/${platform}_manager.sh
             fi
 		fi      
 	done

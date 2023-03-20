@@ -1,18 +1,4 @@
 #!/bin/sh
-# +++ Description Start +++
-# 将Lame3.1编译为android上的so库,默认架构arm64-v8a.
-# === Description End ===
-
-
-# +++ 导入工具Shell Start +++
-# . ${g_scriptArchDir}/util.sh
-# === 导入工具Shell End ===
-
-
-# +++ 用户指定变量 Start+++
-
-# === 用户指定变量 End ===
-
 
 # +++ 变量声明 Start+++
 libId="lame-3.100"
@@ -33,10 +19,27 @@ if [[ ! -e ${outputLibDir} ]]; then
     mkdir -p ${outputLibDir}
 fi
 
-
-# 该库的编译时间
-isConfigure="$1"
-isMake="$2"
+# 判断是否要编译和make
+libBuildType=$1
+echo "libBuildType:${libBuildType}"
+case $1 in
+    $LIB_BUILD_TYPE_CONFIGURE)
+    isConfigure="Y"
+    isMake="N"
+    ;;
+    $LIB_BUILD_TYPE_MAKE)
+    isConfigure="N"
+    isMake="Y"
+    ;;
+    $LIB_BUILD_TYPE_CONFIGURE_MAKE)
+    isConfigure="Y"
+    isMake="Y"
+    ;;
+    $LIB_BUILD_TYPE_IGNORE)
+    isConfigure="N"
+    isMake="N"
+    ;;
+esac
 
 # === 变量声明 End ===
 
@@ -50,10 +53,10 @@ doClean() {
     fi
     
 
-    # clean动作不做失败检查,继续.
     if [[ -e "makefile" ]]; then 
         echo "clean"
         make clean
+        [[ $? != 0 ]] && echo "--- clean failed ---\n\n\n" && exit
     else 
         echo "No need to clean"
     fi
@@ -61,37 +64,15 @@ doClean() {
 }
 
 
-# configure做的事情:
-# 1 设置makefile需要的一些环境变量,根据架构的不同,可能不同.
-# 2 配置configure的flag,根据架构的不同,可能不同.
-# 3 configure,得到makefile文件.
-# 根据要编译出来的ffmpeg的功能,设置ffempg,这里希望能够代码播放flv.
 doConfigure() {
     echo "+++ configure start +++" 
-    
-	# host,cc,cxx是必须指定正确的.
-	host="${g_host}"
-	# C编译器
-    export CC="${g_cc}"
-	export CFLAGS="-arch x86_64"
-	export LDFLAGS="-arch x86_64"
 
-    flag=""
-	flag+=" --enable-shared"
-	flag+=" --disable-frontend"
-	if [[ "${g_configure}" = "debug" ]]; then
-		flag+=" --enable-debug=alot"
-	else
-		flag+=" --enable-debug=no"
-	fi
-	flag+=" --enable-static=yes"
-	flag+=" --host=${host}"
-	flag+=" --prefix=${outputLibDir}"
 
-    
-    ${sourceLibDir}/configure ${flag} 
+
+
+    ${sourceLibDir}/configure ${g_flag} 
     # echo ${flag} | xargs ${sourceLibDir}/configure
-    # 不做流程控制,如果configure失败,由main函数决定流程.
+    [[ $? != 0 ]] && echo "--- configure failed ---\n\n\n" && exit
     echo "=== configure end ===\n\n\n"
 }
 
@@ -105,7 +86,7 @@ doCMake() {
 doMake() {
     echo "+++ make start +++"
     make -j4
-    [[ $? != 0 ]] && echo "--- make failed ---" && return -1
+    [[ $? != 0 ]] && echo "--- make failed ---\n\n\n" && exit
     echo "=== make end ===\n\n\n"
 }
 doInstall() {
@@ -123,7 +104,7 @@ main () {
     if [[ ${isConfigure} == "Y" ]]; then
         doClean
         doConfigure
-        [[ $? != 0 ]] && echo "doConfigure failed" && exit
+        [[ $? != 0 ]] && echo "configure failed" && exit
         # doCMake
     else 
         echo "No need to configure."
@@ -132,9 +113,8 @@ main () {
     if [[ ${isMake} == "Y" ]]; then
         rm -rf ${outputLibDir}
         doMake
-        [[ $? != 0 ]] && echo "--- doMake failed ---\n\n\n" && exit
         doInstall
-        [[ $? != 0 ]] && echo "doInstall failed" && exit
+        [[ $? != 0 ]] && echo "make failed" && exit
     else 
         echo "No need to make."
     fi

@@ -2,14 +2,15 @@
 
 libName="lame"
 libVersion="3.100"
-libId="${libName}_${libVersion}"
+libId="${libName}-${libVersion}"
 scriptId=${g_platform}_${g_arch}_${libId}
 
 # 源码目录
-libSourceDir=${g_projectDir}/01_input/${libId}
+libSourceDir=${g_inputRootDir}/${libId}
 # 脚本目录
-libScriptDir=${g_projectDir}/02_script/${g_platform}/${g_arch}
+libScriptDir=${g_scriptRootDir}/${g_platform}/${g_arch}
 # Build目录
+
 buildLibDir=${g_buildArchDir}/${libId}
 if [[ ! -e ${buildLibDir} ]]; then
     mkdir -p ${buildLibDir}
@@ -20,17 +21,28 @@ if [[ ! -e ${outputLibDir} ]]; then
     mkdir -p ${outputLibDir}
 fi
 
-export libConfigureTsFilePath=${buildLibDir}/configure.time
-export libMakeTsFilePath=${buildLibDir}/make.time
 
-# 该库的编译时间
-libConfigureTs=""
-libMakeTs=""
-# 是否需要configure
-isConfigure=""
-# 是否需要make
-isMake=""
-
+# 是否需要configure # 是否需要make
+libBuildType=$1
+echo "libBuildType:${libBuildType}"
+case $1 in
+    $LIB_BUILD_TYPE_CONFIGURE)
+    isConfigure="Y"
+    isMake="N"
+    ;;
+    $LIB_BUILD_TYPE_MAKE)
+    isConfigure="N"
+    isMake="Y"
+    ;;
+    $LIB_BUILD_TYPE_CONFIGURE_MAKE)
+    isConfigure="Y"
+    isMake="Y"
+    ;;
+    $LIB_BUILD_TYPE_IGNORE)
+    isConfigure="N"
+    isMake="N"
+    ;;
+esac
 
 
 doClean() {
@@ -68,7 +80,6 @@ doConfigure() {
 	flags+=" --prefix=${outputLibDir}"
 	# flags+=" --srcdir=${libSourceDir}"
 	 
-
     export CC="${g_cc}"
     # # export CFLAGS="-arch arm64 -fembed-bitcode -miphoneos-version-min=8.0"
     # # export LDFLAGS="-arch arm64 -fembed-bitcode -miphoneos-version-min=8.0"
@@ -83,8 +94,6 @@ doConfigure() {
 	echo "flags is: ${flags}"
     # echo ${flags} | xargs ${libSourceDir}/configure
 	${libSourceDir}/configure ${flags}
-
-        
 
 	[[ $? != 0 ]] && echo "--- configure failed ---\n" && exit
     echo "=== configure end ===\n"
@@ -140,18 +149,18 @@ main () {
         doConfigure
 		# doCMake    
         [[ $? != 0 ]] && echo "configure failed" && exit
-        echo ${g_archConfigureTs} 1> ${g_libConfigureTsFilePath}    
+    else  
+        echo "set no configure"
     fi
     
-    # if [[ ${isMake} == "Y" ]]; then
-    #     rm -rf ${outputLibDir}
+    if [[ ${isMake} == "Y" ]]; then
+        rm -rf ${outputLibDir}
         doMake
         doInstall
-    #     [[ $? != 0 ]] && echo "make failed" && exit
-    #     echo ${g_archMakeTs} 1> ${g_libMakeTsFilePath}
-    # else 
-    #     echo "No need to make."
-    # fi
+        [[ $? != 0 ]] && echo "make failed" && exit
+    else 
+        echo "set no make"
+    fi
 
     doFinish
     echo "=== Build ${libId} for ${g_platform} with ${g_arch} finish ===\n\n\n"

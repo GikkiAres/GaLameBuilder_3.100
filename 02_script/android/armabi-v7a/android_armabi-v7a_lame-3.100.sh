@@ -61,46 +61,9 @@ doClean() {
     echo "=== clean end ===\n\n\n"
 }
 
-
-# configure做的事情:
-# 1 设置makefile需要的一些环境变量,根据架构的不同,可能不同.
-# 2 配置configure的flag,根据架构的不同,可能不同.
-# 3 configure,得到makefile文件.
-# 根据要编译出来的ffmpeg的功能,设置ffempg,这里希望能够代码播放flv.
 doConfigure() {
-    echo "+++ configure start +++" 
-
-	# host,cc,cxx是必须指定正确的.
-	host="armv7a-linux-androideabi"
-    toolChainDir=${g_ndkDir}/toolchains/llvm/prebuilt/darwin-x86_64
-
-	# C++编译器
-    export CXX="${toolChainDir}/bin/${host}${g_apiLevel}-clang++"
-	# C编译器
-    export CC="${toolChainDir}/bin/${host}${g_apiLevel}-clang"
-
-	export LD="${toolChainDir}/bin/arm-linux-androideabi-ld"
-	export AS="${toolChainDir}/bin/arm-linux-androideabi-as"
-    export LD="${toolChainDir}/bin/arm-linux-androideabi-ld"
-    export NM="${toolChainDir}/bin/arm-linux-androideabi-nm"
-    export STRIP="${toolChainDir}/bin/arm-linux-androideabi-strip"
-    export RANLIB="${toolChainDir}/bin/arm-linux-androideabi-ranlib"
-    export AR="${toolChainDir}/bin/arm-linux-androideabi-ar"
-    
-	flag=""
-	flag+=" --enable-shared"
-	flag+=" --disable-frontend"
-	if [[ "${g_configure}" = "debug" ]]; then
-		flag+=" --enable-debug=alot"
-	else
-		flag+=" --enable-debug=no"
-	fi
-	flag+=" --enable-static=no"
-	flag+=" --host=${host}"
-	flag+=" --prefix=${outputLibDir}"
-
-    
-    ${sourceLibDir}/configure ${flag} 
+    echo "+++ configure start +++"     
+    ${sourceLibDir}/configure ${g_flag} 
     # echo ${flag} | xargs ${sourceLibDir}/configure
     [[ $? != 0 ]] && echo "--- configure failed ---\n\n\n" && exit
     echo "=== configure end ===\n\n\n"
