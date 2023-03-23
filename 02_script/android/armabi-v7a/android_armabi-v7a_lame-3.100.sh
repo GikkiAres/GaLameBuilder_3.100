@@ -1,7 +1,11 @@
 #!/bin/sh
 
 # +++ Description Start +++
-# 将Lame3.1编译为android上的so库,默认架构arm64-v8a.
+# android_arm64_v8a_lame-3.100.sh的任务:
+# 1,配置g_flag变量.
+# 2,配置输出位置
+# 3,配置编译临时目录.
+# 4,定义是否configure和make
 # === Description End ===
 
 
@@ -16,103 +20,39 @@
 
 
 # +++ 变量声明 Start+++
-libId="lame-3.100"
-scriptId=${g_platform}_${g_arch}_${libId}
-# 源码目录
-sourceLibDir=${g_inputRootDir}/${libId}
-# 脚本目录
-scriptLibDir=${g_scriptArchDir}/${libId}
-# 中间目录
-buildLibDir=${g_buildArchDir}/${libId}
-if [[ ! -e ${buildLibDir} ]]; then
-    mkdir -p ${buildLibDir}
+export g_libId="lame-3.100"
+export g_scriptId=${g_platform}_${g_arch}_${g_libId}
+# 源码-库目录
+export g_sourceLibDir=${g_inputRootDir}/${g_libId}
+# 脚本-库目录
+g_scriptLibDir=${g_scriptArchDir}/${g_libId}
+# Build-库目录
+export g_buildLibDir=${g_buildArchDir}/${g_libId}
+if [[ ! -e ${g_buildLibDir} ]]; then
+    mkdir -p ${g_buildLibDir}
 fi
 
-# 安装目录
-outputLibDir=${g_outputArchDir}/${libId}
-if [[ ! -e ${outputLibDir} ]]; then
-    mkdir -p ${outputLibDir}
+# Output-库目录
+export g_outputLibDir=${g_outputArchDir}/${g_libId}
+if [[ ! -e ${g_outputLibDir} ]]; then
+    mkdir -p ${g_outputLibDir}
 fi
 
 
-# 该库的编译时间
-isConfigure="$1"
-isMake="$2"
-
-# === 变量声明 End ===
+# 判断是否要编译和make
+export g_libBuildType=$1
+echo "libBuildType:${g_libBuildType}"
 
 
-doClean() {
-    echo "+++ clean start +++"
-
-    if [[ -e "${sourceLibDir}/makefile" ]]; then 
-        echo "distclean"
-        make -C ${sourceLibDir} distclean
-    fi
-    
-
-    if [[ -e "makefile" ]]; then 
-        echo "clean"
-        make clean
-        [[ $? != 0 ]] && echo "--- clean failed ---\n\n\n" && exit
-    else 
-        echo "No need to clean"
-    fi
-    echo "=== clean end ===\n\n\n"
-}
-
-doConfigure() {
-    echo "+++ configure start +++"     
-    ${sourceLibDir}/configure ${g_flag} 
-    # echo ${flag} | xargs ${sourceLibDir}/configure
-    [[ $? != 0 ]] && echo "--- configure failed ---\n\n\n" && exit
-    echo "=== configure end ===\n\n\n"
-}
-
-doCMake() {
-    echo "\n\n\n+++ cmake start +++"
-    cmake ${g_projectDir}/02_Script/android/${g_arch}/CMakeLists.txt -B ${buildDir}
-    [[ $? != 0 ]] && echo "--- cmake failed ---\n\n\n" && exit
-    echo "=== cmake end ===\n"
-}
-
-doMake() {
-    echo "+++ make start +++"
-    make -j4
-    [[ $? != 0 ]] && echo "--- make failed ---\n\n\n" && exit
-    echo "=== make end ===\n\n\n"
-}
-doInstall() {
-    echo "+++ install start +++"
-    make install
-    [[ $? != 0 ]] && echo "--- install failed ---\n\n\n" && exit
-    echo "=== install end ===\n\n\n"
-}
-
-
-main () {
-    echo "\n\n\n+++ Build ${libId} for ${g_platform} with ${g_arch} start  +++"
-    cd ${buildLibDir}
-
-    if [[ ${isConfigure} == "Y" ]]; then
-        doClean
-        doConfigure
-        [[ $? != 0 ]] && echo "configure failed" && exit
-        # doCMake
-    else 
-        echo "No need to configure."
-    fi
-
-    if [[ ${isMake} == "Y" ]]; then
-        rm -rf ${outputLibDir}
-        doMake
-        doInstall
-        [[ $? != 0 ]] && echo "make failed" && exit
-    else 
-        echo "No need to make."
-    fi
-    # doFinish
-    echo "=== Build ${libId} for ${g_platform} with ${g_arch} finish ===\n\n\n"
-}
-
-main
+# 定义configure flag.
+export g_flag=""
+g_flag+=" --enable-shared"
+g_flag+=" --disable-frontend"
+if [[ "${g_configure}" = "debug" ]]; then
+    g_flag+=" --enable-debug=alot"
+else
+    g_flag+=" --enable-debug=no"
+fi
+g_flag+=" --enable-static=no"
+g_flag+=" --host=${g_host}"
+g_flag+=" --prefix=${g_outputLibDir}"

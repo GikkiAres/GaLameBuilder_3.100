@@ -21,7 +21,6 @@
 
 # +++ 变量声明 Start+++
 export g_libId="lame-3.100"
-export g_scriptId=${g_platform}_${g_arch}_${g_libId}
 # 源码-库目录
 export g_sourceLibDir=${g_inputRootDir}/${g_libId}
 # 脚本-库目录

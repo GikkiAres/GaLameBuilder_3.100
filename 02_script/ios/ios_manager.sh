@@ -1,6 +1,6 @@
 # 配置信息 Start #
 archArray=("arm64" "armv7s" "x86_64" "i386")
-archBuildFlagArray=($BUILD_FLAG_NO $BUILD_FLAG_NO $BUILD_FLAG_NO $BUILD_FLAG_NO)
+archBuildFlagArray=($BUILD_FLAG_NO $BUILD_FLAG_NO $BUILD_FLAG_YES $BUILD_FLAG_NO)
 # 配置信息 End #
 
 
@@ -47,12 +47,11 @@ for ((i = 0; i < ${length}; i++)); do
     archBuildFlag=${archBuildFlagArray[i]}
     echo "arch:${arch},archBuildFlag:${archBuildFlag}"
     if [[ "${archBuildFlag}" == $BUILD_FLAG_YES ]]; then
-         . "${g_projectDir}/02_Script/${g_platform}/${arch}/${g_platform}_${arch}_config.sh"
-         . "${g_projectDir}/02_Script/${g_platform}/${g_platform}_build_lame-3.100.sh" $LIB_BUILD_TYPE_CONFIGURE_MAKE
+         . ${g_projectDir}/02_Script/${g_platform}/${arch}/${g_platform}_${arch}_manager.sh
     fi
 done
 
-isMerge=$BUILD_FLAG_YES
+isMerge=$BUILD_FLAG_NO
 
 #合并Thin->Fat,.执行合并操作.
 if [[ $isMerge == $BUILD_FLAG_YES ]]; then

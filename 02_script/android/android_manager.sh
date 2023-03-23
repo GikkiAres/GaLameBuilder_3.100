@@ -1,12 +1,13 @@
 # 配置变量 Start #
 archArray=("arm64-v8a" "armabi-v7a")
-archBuildFlagArray=($BUILD_FLAG_YES $BUILD_FLAG_NO)
+archBuildFlagArray=($BUILD_FLAG_NO $BUILD_FLAG_YES)
 # 配置变量 End #
 
 
 #
-#platformManager:负责导入各个arch的config文件,然后执行各个arch的manager文件
-#archManager:负责导入各个lib的
+# AndroidManager的任务:
+# 1 负责导入各个arch的config文件,然后执行各个arch的manager文件
+# 2 如果有必要合并各个arch的库
 #
 
 # platform级别的变量定义
@@ -31,8 +32,7 @@ for ((i = 0; i < ${length}; i++)); do
     archBuildFlag=${archBuildFlagArray[i]}
     echo "arch:${arch},archBuildFlag:${archBuildFlag}"
     if [[ "${archBuildFlag}" == $BUILD_FLAG_YES ]]; then
-         . "${g_projectDir}/02_Script/${g_platform}/${arch}/${g_platform}_${arch}_config.sh"
-         . "${g_projectDir}/02_Script/${g_platform}/${g_platform}_build_lame-3.100.sh" $LIB_BUILD_TYPE_CONFIGURE_MAKE
+         . ${g_projectDir}/02_Script/${g_platform}/${arch}/${g_platform}_${arch}_manager.sh
     fi
 done
 

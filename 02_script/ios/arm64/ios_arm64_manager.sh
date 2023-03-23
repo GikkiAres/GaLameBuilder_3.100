@@ -13,7 +13,7 @@
 # === Description End ===
 
 # +++ 变量声明 Start+++
-export g_arch="arm64-v8a"
+export g_arch="arm64"
 
 # 当前脚本的架构目录
 export g_scriptArchDir=${g_scriptPlatformDir}/${g_arch}
@@ -26,26 +26,14 @@ export g_outputArchDir=${g_outputPlatformDir}/${g_arch}
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
 
 
-# 环境变量
-export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
 
 # host,cc,cxx是必须指定正确的.
-export g_host="aarch64-linux-android"
-toolChainDir=${g_ndkDir}/toolchains/llvm/prebuilt/darwin-x86_64
-
+export g_arch="arm64"
+export g_host="aarch64-apple-darwin"
+# C Compiler,通过xcrun -sdk,同时设置了其他交叉编译工具.
+export CC="xcrun -sdk iphoneos clang -target ${g_arch}-${vendor}-ios${g_minSdkVersion}"
 # C++编译器
-export CXX="${toolChainDir}/bin/${g_host}${g_apiLevel}-clang++"
-# C编译器
-export CC="${toolChainDir}/bin/${g_host}${g_apiLevel}-clang"
-
-commonPrefix="aarch64-linux-android-"
-export LD="${toolChainDir}/bin/${commonPrefix}ld"
-export AS="${toolChainDir}/bin/${commonPrefix}as"
-export LD="${toolChainDir}/bin/${commonPrefix}ld"
-export NM="${toolChainDir}/bin/${commonPrefix}nm"
-export STRIP="${toolChainDir}/bin/${commonPrefix}strip"
-export RANLIB="${toolChainDir}/bin/${commonPrefix}ranlib"
-export AR="${toolChainDir}/bin/${commonPrefix}ar"
+# export CC="xcrun -sdk iphoneos clang++ -target ${g_arch}-${vendor}-ios${g_minSdkVersion}"
 
 
 main () {

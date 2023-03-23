@@ -20,8 +20,7 @@ for ((i = 0; i < ${length}; i++)); do
     archBuildFlag=${archBuildFlagArray[i]}
     echo "arch:${arch},archBuildFlag:${archBuildFlag}"
     if [[ "${archBuildFlag}" == $BUILD_FLAG_YES ]]; then
-         . "${g_projectDir}/02_Script/${g_platform}/${arch}/${g_platform}_${arch}_config.sh"
-         . "${g_projectDir}/02_Script/${g_platform}/${g_platform}_build_lame-3.100.sh" $LIB_BUILD_TYPE_CONFIGURE_MAKE
+         . ${g_projectDir}/02_Script/${g_platform}/${arch}/${g_platform}_${arch}_manager.sh
     fi
 done
 
@@ -54,7 +53,7 @@ function mergeThinToFat() {
     echo "Merge,compete"
 }
 
-isMerge=$BUILD_FLAG_YES
+isMerge=$BUILD_FLAG_NO
 
 #合并Thin->Fat,.执行合并操作.
 if [[ $isMerge == $BUILD_FLAG_YES ]]; then

@@ -13,7 +13,10 @@
 # === Description End ===
 
 # +++ 变量声明 Start+++
-export g_arch="arm64-v8a"
+export g_arch="x86_64"
+export g_host="x86_64-apple-darwin"
+export g_cc="xcrun -sdk macosx clang -target ${g_arch}-${vendor}-macos${g_minSdkVersion}"
+# export CC="xcrun -sdk iphonesimulator clang -target ${g_arch}-${vendor}-ios${g_minSdkVersion}"
 
 # 当前脚本的架构目录
 export g_scriptArchDir=${g_scriptPlatformDir}/${g_arch}
@@ -25,27 +28,6 @@ export g_outputArchDir=${g_outputPlatformDir}/${g_arch}
 # 环境变量
 export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
 
-
-# 环境变量
-export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
-
-# host,cc,cxx是必须指定正确的.
-export g_host="aarch64-linux-android"
-toolChainDir=${g_ndkDir}/toolchains/llvm/prebuilt/darwin-x86_64
-
-# C++编译器
-export CXX="${toolChainDir}/bin/${g_host}${g_apiLevel}-clang++"
-# C编译器
-export CC="${toolChainDir}/bin/${g_host}${g_apiLevel}-clang"
-
-commonPrefix="aarch64-linux-android-"
-export LD="${toolChainDir}/bin/${commonPrefix}ld"
-export AS="${toolChainDir}/bin/${commonPrefix}as"
-export LD="${toolChainDir}/bin/${commonPrefix}ld"
-export NM="${toolChainDir}/bin/${commonPrefix}nm"
-export STRIP="${toolChainDir}/bin/${commonPrefix}strip"
-export RANLIB="${toolChainDir}/bin/${commonPrefix}ranlib"
-export AR="${toolChainDir}/bin/${commonPrefix}ar"
 
 
 main () {

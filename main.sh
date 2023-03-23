@@ -11,7 +11,7 @@ export BUILD_FLAG_YES="Y"
 # 判断当前平台是不是该平台,是就编译否则不编译.
 export BUILD_FLAG_AUTO="A"
 platformArray=("ios" "android" "mac" "linux")
-valueArray=($BUILD_FLAG_NO $BUILD_FLAG_YES $BUILD_FLAG_NO $BUILD_FLAG_NO)
+valueArray=($BUILD_FLAG_NO $BUILD_FLAG_NO $BUILD_FLAG_YES $BUILD_FLAG_NO)
 
 ### User Configure End ###
 
